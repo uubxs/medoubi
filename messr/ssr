@@ -119,6 +119,9 @@ Set_iptables(){
 		chmod +x /etc/network/if-pre-up.d/iptables
 	fi
 }
+#Install SSR-Bash Background
+wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
+chmod +x /usr/local/bin/ssr
 # 读取 配置信息
 Get_IP(){
 	ip=$(wget -qO- -t1 -T2 ipinfo.io/ip)
