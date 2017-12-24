@@ -72,7 +72,7 @@ BBR_installation_status(){
 	if [[ ! -e ${BBR_file} ]]; then
 		echo -e "${Error} 没有发现 BBR脚本，开始下载..."
 		cd "${file}"
-		if ! wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/bbr.sh; then
+		if ! wget -N --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/bbr.sh; then
 			echo -e "${Error} BBR 脚本下载失败 !" && exit 1
 		else
 			echo -e "${Info} BBR 脚本下载完成 !"
@@ -333,12 +333,12 @@ View_User(){
 	do
 		echo -e "请输入要查看账号信息的用户 端口"
 		stty erase '^H' && read -p "(默认: 取消):" View_user_port
-		[[ -z "${View_user_port}" ]] && echo -e "已取消..." && exit 1
+		[[ -z "${View_user_port}" ]] && echo -e "已取消..." && ssr
 		View_user=$(cat "${config_user_mudb_file}"|grep '"port": '"${View_user_port}"',')
 		if [[ ! -z ${View_user} ]]; then
 			Get_User_info "${View_user_port}"
 			View_User_info
-			break
+			View_everyUser
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
@@ -374,8 +374,8 @@ View_User_info(){
 # 设置 配置信息
 Set_config_user(){
 	echo "请输入要设置的用户 用户名(请勿重复, 用于区分, 不支持中文, 会报错 !)"
-	stty erase '^H' && read -p "(默认: doubi):" ssr_user
-	[[ -z "${ssr_user}" ]] && ssr_user="doubi"
+	stty erase '^H' && read -p "(默认: uubxs):" ssr_user
+	[[ -z "${ssr_user}" ]] && ssr_user="uubxs"
 	echo && echo ${Separator_1} && echo -e "	用户名 : ${Green_font_prefix}${ssr_user}${Font_color_suffix}" && echo ${Separator_1} && echo
 }
 Set_config_port(){
@@ -399,8 +399,8 @@ Set_config_port(){
 }
 Set_config_password(){
 	echo "请输入要设置的用户 密码"
-	stty erase '^H' && read -p "(默认: doub.io):" ssr_password
-	[[ -z "${ssr_password}" ]] && ssr_password="doub.io"
+	stty erase '^H' && read -p "(默认: uubxs.net):" ssr_password
+	[[ -z "${ssr_password}" ]] && ssr_password="uubxs.net"
 	echo && echo ${Separator_1} && echo -e "	密码 : ${Green_font_prefix}${ssr_password}${Font_color_suffix}" && echo ${Separator_1} && echo
 }
 Set_config_method(){
@@ -428,8 +428,8 @@ Set_config_method(){
  ${Green_font_prefix}15.${Font_color_suffix} chacha20
  ${Green_font_prefix}16.${Font_color_suffix} chacha20-ietf
  ${Tip} salsa20/chacha20-*系列加密方式，需要额外安装依赖 libsodium ，否则会无法启动ShadowsocksR !" && echo
-	stty erase '^H' && read -p "(默认: 5. aes-128-ctr):" ssr_method
-	[[ -z "${ssr_method}" ]] && ssr_method="5"
+	stty erase '^H' && read -p "(默认: 10. aes-256-cfb):" ssr_method
+	[[ -z "${ssr_method}" ]] && ssr_method="10"
 	if [[ ${ssr_method} == "1" ]]; then
 		ssr_method="none"
 	elif [[ ${ssr_method} == "2" ]]; then
@@ -476,8 +476,8 @@ Set_config_protocol(){
  ${Green_font_prefix}5.${Font_color_suffix} auth_chain_a
  ${Green_font_prefix}6.${Font_color_suffix} auth_chain_b
  ${Tip} 如果使用 auth_chain_* 系列协议，建议加密方式选择 none (该系列协议自带 RC4 加密)，混淆随意" && echo
-	stty erase '^H' && read -p "(默认: 3. auth_aes128_md5):" ssr_protocol
-	[[ -z "${ssr_protocol}" ]] && ssr_protocol="3"
+	stty erase '^H' && read -p "(默认: 1. origin):" ssr_protocol
+	[[ -z "${ssr_protocol}" ]] && ssr_protocol="1"
 	if [[ ${ssr_protocol} == "1" ]]; then
 		ssr_protocol="origin"
 	elif [[ ${ssr_protocol} == "2" ]]; then
@@ -512,8 +512,8 @@ Set_config_obfs(){
  ${Green_font_prefix}5.${Font_color_suffix} tls1.2_ticket_auth
  ${Tip} 如果使用 ShadowsocksR 代理游戏，建议选择 混淆兼容原版或 plain 混淆，然后客户端选择 plain，否则会增加延迟 !
  另外, 如果你选择了 tls1.2_ticket_auth，那么客户端可以选择 tls1.2_ticket_fastauth，这样即能伪装特征 又不会增加延迟 !" && echo
-	stty erase '^H' && read -p "(默认: 5. tls1.2_ticket_auth):" ssr_obfs
-	[[ -z "${ssr_obfs}" ]] && ssr_obfs="5"
+	stty erase '^H' && read -p "(默认: 1. plain):" ssr_obfs
+	[[ -z "${ssr_obfs}" ]] && ssr_obfs="1"
 	if [[ ${ssr_obfs} == "1" ]]; then
 		ssr_obfs="plain"
 	elif [[ ${ssr_obfs} == "2" ]]; then
@@ -731,6 +731,7 @@ Modify_config_password(){
 		echo -e "${Error} 用户密码修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && exit 1
 	else
 		echo -e "${Info} 用户密码修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)"
+		Set_config_mepassword
 	fi
 }
 Modify_config_method(){
@@ -802,6 +803,7 @@ Modify_config_forbid(){
 }
 Modify_config_enable(){
 	sed -i "${ssr_enable_num}"'s/"enable": '"$(echo ${enable})"',/"enable": '"$(echo ${ssr_enable})"',/' ${config_user_mudb_file}
+	ssr
 }
 Modify_user_api_server_pub_addr(){
 	sed -i "s/SERVER_PUB_ADDR = '${server_pub_addr}'/SERVER_PUB_ADDR = '${ssr_server_pub_addr}'/" ${config_user_api_file}
@@ -816,6 +818,7 @@ Modify_config_all(){
 	Modify_config_speed_limit_per_user
 	Modify_config_transfer
 	Modify_config_forbid
+	ssr
 }
 Check_python(){
 	python_ver=`python -h`
@@ -844,9 +847,9 @@ Debian_apt(){
 # 下载 ShadowsocksR
 Download_SSR(){
 	cd "/usr/local"
-	wget -N --no-check-certificate "https://github.com/ToyoDAdoubi/shadowsocksr/archive/manyuser.zip"
+	wget -N --no-check-certificate "https://github.com/uubxs/shadowsocksr/archive/manyuser.zip"
 	#git config --global http.sslVerify false
-	#env GIT_SSL_NO_VERIFY=true git clone -b manyuser https://github.com/ToyoDAdoubi/shadowsocksr.git
+	#env GIT_SSL_NO_VERIFY=true git clone -b manyuser https://github.com/uubxs/shadowsocksr.git
 	#[[ ! -e ${ssr_folder} ]] && echo -e "${Error} ShadowsocksR服务端 下载失败 !" && exit 1
 	[[ ! -e "manyuser.zip" ]] && echo -e "${Error} ShadowsocksR服务端 压缩包 下载失败 !" && rm -rf manyuser.zip && exit 1
 	unzip "manyuser.zip"
@@ -873,8 +876,8 @@ Service_SSR(){
 		fi
 		chmod +x /etc/init.d/ssrmu
 		#Install SSR-Bash Background
-       wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
-       chmod +x /usr/local/bin/ssr
+        wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
+        chmod +x /usr/local/bin/ssr
 		chkconfig --add ssrmu
 		chkconfig ssrmu on
 	else
@@ -1131,9 +1134,25 @@ get_IP_address(){
 		done
 	fi
 }
+# 我自己多加的一个只看单个配置信息
+View_onlyUser(){
+	while true
+	do
+		echo -e "请输入要修改的用户 端口"
+		stty erase '^H' && read -p "(默认: 取消):" ssr_port
+		[[ -z "${ssr_port}" ]] && echo -e "已取消..." && ssr
+		View_onlyUser=$(cat "${config_user_mudb_file}"|grep '"port": '"${ssr_port}"',')
+		if [[ ! -z ${View_onlyUser} ]]; then
+			Get_User_info "${ssr_port}"
+			View_User_info
+			break
+		else
+			echo -e "${Error} 请输入正确的端口 !"
+		fi
+	done
+}
 # 修改 用户配置
 Modify_port(){
-	List_port_user
 	while true
 	do
 		echo -e "请输入要修改的用户 端口"
@@ -1145,6 +1164,33 @@ Modify_port(){
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
+	done
+}
+# 我自己加的一个循环查看用户信息
+View_everyUser(){
+	SSR_installation_status
+	while true
+	do
+		echo -e "请输入要查看账号信息的用户 端口"
+		stty erase '^H' && read -p "(默认: 取消):" View_user_port
+		[[ -z "${View_user_port}" ]] && echo -e "已取消..." && ssr
+		View_everyUser=$(cat "${config_user_mudb_file}"|grep '"port": '"${View_user_port}"',')
+		if [[ ! -z ${View_everyUser} ]]; then
+			Get_User_info "${View_user_port}"
+			View_User_info
+			break
+		else
+			echo -e "${Error} 请输入正确的端口 !"
+		fi
+	done
+}
+# 我自己加的一个循环修改密码
+Set_config_mepassword(){
+while true
+	do
+        View_onlyUser
+		Set_config_password
+		Modify_config_password
 	done
 }
 Modify_Config(){
@@ -1168,13 +1214,13 @@ Modify_Config(){
  
  ${Tip} 用户的用户名和端口是无法修改，如果需要修改请使用脚本的 手动修改功能 !" && echo
 	stty erase '^H' && read -p "(默认: 取消):" ssr_modify
-	[[ -z "${ssr_modify}" ]] && echo "已取消..." && exit 1
+	[[ -z "${ssr_modify}" ]] && echo "已取消..." && ssr
 	if [[ ${ssr_modify} == "1" ]]; then
 		Add_port_user
 	elif [[ ${ssr_modify} == "2" ]]; then
 		Del_port_user
 	elif [[ ${ssr_modify} == "3" ]]; then
-		Modify_port
+		View_onlyUser
 		Set_config_password
 		Modify_config_password
 	elif [[ ${ssr_modify} == "4" ]]; then
@@ -1342,7 +1388,6 @@ Clear_transfer(){
 	fi
 }
 Clear_transfer_one(){
-	List_port_user
 	while true
 	do
 		echo -e "请输入要清零已使用流量的用户 端口"
@@ -1631,7 +1676,7 @@ Other_functions(){
   ${Green_font_prefix}7.${Font_color_suffix} 监控 ShadowsocksR服务端运行状态
   —— 说明：该功能适合于SSR服务端经常进程结束，启动该功能后会每分钟检测一次，当进程不存在则自动启动SSR服务端。" && echo
 	stty erase '^H' && read -p "(默认: 取消):" other_num
-	[[ -z "${other_num}" ]] && echo "已取消..." && exit 1
+	[[ -z "${other_num}" ]] && echo "已取消..." && ssr
 	if [[ ${other_num} == "1" ]]; then
 		Configure_BBR
 	elif [[ ${other_num} == "2" ]]; then
@@ -1652,12 +1697,12 @@ Other_functions(){
 }
 # 封禁 BT PT SPAM
 BanBTPTSPAM(){
-	wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh banall
+	wget -N --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh banall
 	rm -rf ban_iptables.sh
 }
 # 解封 BT PT SPAM
 UnBanBTPTSPAM(){
-	wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh unbanall
+	wget -N --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh unbanall
 	rm -rf ban_iptables.sh
 }
 Set_config_connect_verbose_info(){
@@ -1807,16 +1852,16 @@ else
 	echo -e "  ShadowsocksR MuJSON一键管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
   ---- Toyo | doub.io/ss-jc60 ----
 
-  ${Green_font_prefix}1.${Font_color_suffix} 安装 ShadowsocksR
-  ${Green_font_prefix}2.${Font_color_suffix} 更新 ShadowsocksR
-  ${Green_font_prefix}3.${Font_color_suffix} 卸载 ShadowsocksR
-  ${Green_font_prefix}4.${Font_color_suffix} 安装 libsodium(chacha20)
+  ${Green_font_prefix}1.${Font_color_suffix} 查看 账号信息
+  ${Green_font_prefix}2.${Font_color_suffix} 设置 用户配置
+  ${Green_font_prefix}3.${Font_color_suffix} 显示 连接信息
+  ${Green_font_prefix}4.${Font_color_suffix} 手动 修改配置
+  ${Green_font_prefix}5.${Font_color_suffix} 清零 已用流量
 ————————————
-  ${Green_font_prefix}5.${Font_color_suffix} 查看 账号信息
-  ${Green_font_prefix}6.${Font_color_suffix} 显示 连接信息
-  ${Green_font_prefix}7.${Font_color_suffix} 设置 用户配置
-  ${Green_font_prefix}8.${Font_color_suffix} 手动 修改配置
-  ${Green_font_prefix}9.${Font_color_suffix} 清零 已用流量
+  ${Green_font_prefix}6.${Font_color_suffix} 安装 ShadowsocksR
+  ${Green_font_prefix}7.${Font_color_suffix} 更新 ShadowsocksR
+  ${Green_font_prefix}8.${Font_color_suffix} 卸载 ShadowsocksR
+  ${Green_font_prefix}9.${Font_color_suffix} 安装 libsodium(chacha20)
 ————————————
  ${Green_font_prefix}10.${Font_color_suffix} 启动 ShadowsocksR
  ${Green_font_prefix}11.${Font_color_suffix} 停止 ShadowsocksR
@@ -1830,31 +1875,31 @@ else
 	echo && stty erase '^H' && read -p "请输入数字 [1-15]：" num
 case "$num" in
 	1)
-	Install_SSR
+	View_User  
 	;;
 	2)
-	Update_SSR
-	;;
-	3)
-	Uninstall_SSR
-	;;
-	4)
-	Install_Libsodium
-	;;
-	5)
-	View_User
-	;;
-	6)
-	View_user_connection_info
-	;;
-	7)
 	Modify_Config
 	;;
-	8)
+	3)
+	View_user_connection_info
+	;;
+	4)
 	Manually_Modify_Config
 	;;
-	9)
+	5)
 	Clear_transfer
+	;;
+	6)
+	Install_SSR
+	;;
+	7)
+	Update_SSR
+	;;
+	8)
+	Uninstall_SSR
+	;;
+	9)
+	Install_Libsodium
 	;;
 	10)
 	Start_SSR
