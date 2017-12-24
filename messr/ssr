@@ -119,9 +119,6 @@ Set_iptables(){
 		chmod +x /etc/network/if-pre-up.d/iptables
 	fi
 }
-#Install SSR-Bash Background
-wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
-chmod +x /usr/local/bin/ssr
 # 读取 配置信息
 Get_IP(){
 	ip=$(wget -qO- -t1 -T2 ipinfo.io/ip)
@@ -878,6 +875,9 @@ Service_SSR(){
 			echo -e "${Error} ShadowsocksR服务 管理脚本下载失败 !" && exit 1
 		fi
 		chmod +x /etc/init.d/ssrmu
+		#Install SSR-Bash Background
+       wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
+       chmod +x /usr/local/bin/ssr
 		chkconfig --add ssrmu
 		chkconfig ssrmu on
 	else
