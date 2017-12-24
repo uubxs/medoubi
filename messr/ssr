@@ -709,7 +709,7 @@ Set_config_all(){
 		Set_config_speed_limit_per_con
 		Set_config_speed_limit_per_user
 		Set_config_transfer
-		Set_config_forbid
+		#Set_config_forbid
 	else
 		Set_config_user
 		Set_config_port
@@ -721,7 +721,7 @@ Set_config_all(){
 		Set_config_speed_limit_per_con
 		Set_config_speed_limit_per_user
 		Set_config_transfer
-		Set_config_forbid
+		#Set_config_forbid
 	fi
 }
 # 修改 配置信息
@@ -1178,7 +1178,7 @@ View_everyUser(){
 		if [[ ! -z ${View_everyUser} ]]; then
 			Get_User_info "${View_user_port}"
 			View_User_info
-			break
+			View_everUser
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
@@ -1198,7 +1198,7 @@ Modify_Config(){
 	echo && echo -e "你要做什么？
  ${Green_font_prefix}1.${Font_color_suffix}  添加 用户配置
  ${Green_font_prefix}2.${Font_color_suffix}  删除 用户配置
-————— 修改 用户配置 —————
+———————————————
  ${Green_font_prefix}3.${Font_color_suffix}  修改 用户密码
  ${Green_font_prefix}4.${Font_color_suffix}  修改 加密方式
  ${Green_font_prefix}5.${Font_color_suffix}  修改 协议插件
@@ -1852,14 +1852,14 @@ else
 	echo -e "  ShadowsocksR MuJSON一键管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
   ---- Toyo | doub.io/ss-jc60 ----
 
-  ${Green_font_prefix}1.${Font_color_suffix} 查看 账号信息
+  ${Green_font_prefix}1.${Font_color_suffix} 查看 个人用户
   ${Green_font_prefix}2.${Font_color_suffix} 设置 用户配置
   ${Green_font_prefix}3.${Font_color_suffix} 显示 连接信息
   ${Green_font_prefix}4.${Font_color_suffix} 手动 修改配置
   ${Green_font_prefix}5.${Font_color_suffix} 清零 已用流量
+  ${Green_font_prefix}6.${Font_color_suffix} 查看 全部用户
 ————————————
-  ${Green_font_prefix}6.${Font_color_suffix} 安装 ShadowsocksR
-  ${Green_font_prefix}7.${Font_color_suffix} 更新 ShadowsocksR
+  ${Green_font_prefix}7.${Font_color_suffix} 安装 ShadowsocksR
   ${Green_font_prefix}8.${Font_color_suffix} 卸载 ShadowsocksR
   ${Green_font_prefix}9.${Font_color_suffix} 安装 libsodium(chacha20)
 ————————————
@@ -1875,7 +1875,7 @@ else
 	echo && stty erase '^H' && read -p "请输入数字 [1-15]：" num
 case "$num" in
 	1)
-	View_User  
+	View_everyUser  
 	;;
 	2)
 	Modify_Config
@@ -1890,10 +1890,10 @@ case "$num" in
 	Clear_transfer
 	;;
 	6)
-	Install_SSR
+	View_User
 	;;
 	7)
-	Update_SSR
+    Install_SSR
 	;;
 	8)
 	Uninstall_SSR
