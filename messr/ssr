@@ -1178,7 +1178,7 @@ View_everyUser(){
 		if [[ ! -z ${View_everyUser} ]]; then
 			Get_User_info "${View_user_port}"
 			View_User_info
-			View_everUser
+			View_everyUser
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
