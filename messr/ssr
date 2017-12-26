@@ -540,8 +540,8 @@ Set_config_protocol_param(){
 	do
 	echo -e "请输入要设置的用户 欲限制的设备数 (${Green_font_prefix} auth_* 系列协议 不兼容原版才有效 ${Font_color_suffix})"
 	echo -e "${Tip} 设备数限制：每个端口同一时间能链接的客户端数量(多端口模式，每个端口都是独立计算)，建议最少 2个。"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_protocol_param
-	[[ -z "$ssr_protocol_param" ]] && ssr_protocol_param="" && echo && break
+	stty erase '^H' && read -p "(默认: 2):" ssr_protocol_param
+	[[ -z "$ssr_protocol_param" ]] && ssr_protocol_param="2" && echo && break
 	expr ${ssr_protocol_param} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_protocol_param} -ge 1 ]] && [[ ${ssr_protocol_param} -le 9999 ]]; then
@@ -560,8 +560,8 @@ Set_config_speed_limit_per_con(){
 	do
 	echo -e "请输入要设置的用户 单线程 限速上限(单位：KB/S)"
 	echo -e "${Tip} 单线程限速：每个端口 单线程的限速上限，多线程即无效。"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_speed_limit_per_con
-	[[ -z "$ssr_speed_limit_per_con" ]] && ssr_speed_limit_per_con=0 && echo && break
+	stty erase '^H' && read -p "(默认: 3800):" ssr_speed_limit_per_con
+	[[ -z "$ssr_speed_limit_per_con" ]] && ssr_speed_limit_per_con="3800" && echo && break
 	expr ${ssr_speed_limit_per_con} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_speed_limit_per_con} -ge 1 ]] && [[ ${ssr_speed_limit_per_con} -le 131072 ]]; then
@@ -581,8 +581,8 @@ Set_config_speed_limit_per_user(){
 	echo
 	echo -e "请输入要设置的用户 总速度 限速上限(单位：KB/S)"
 	echo -e "${Tip} 端口总限速：每个端口 总速度 限速上限，单个端口整体限速。"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_speed_limit_per_user
-	[[ -z "$ssr_speed_limit_per_user" ]] && ssr_speed_limit_per_user=0 && echo && break
+	stty erase '^H' && read -p "(默认: 3800):" ssr_speed_limit_per_user
+	[[ -z "$ssr_speed_limit_per_user" ]] && ssr_speed_limit_per_user="3800" && echo && break
 	expr ${ssr_speed_limit_per_user} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_speed_limit_per_user} -ge 1 ]] && [[ ${ssr_speed_limit_per_user} -le 131072 ]]; then
@@ -601,8 +601,8 @@ Set_config_transfer(){
 	do
 	echo
 	echo -e "请输入要设置的用户 可使用的总流量上限(单位: GB, 1-838868 GB)"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_transfer
-	[[ -z "$ssr_transfer" ]] && ssr_transfer="838868" && echo && break
+	stty erase '^H' && read -p "(默认: 50):" ssr_transfer
+	[[ -z "$ssr_transfer" ]] && ssr_transfer="50" && echo && break
 	expr ${ssr_transfer} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_transfer} -ge 1 ]] && [[ ${ssr_transfer} -le 838868 ]]; then
@@ -731,7 +731,6 @@ Modify_config_password(){
 		echo -e "${Error} 用户密码修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && exit 1
 	else
 		echo -e "${Info} 用户密码修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)"
-		Set_config_mepassword
 	fi
 }
 Modify_config_method(){
@@ -790,7 +789,7 @@ Modify_config_transfer(){
 	if [[ -z "${match_edit}" ]]; then
 		echo -e "${Error} 用户总流量修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && exit 1
 	else
-		echo -e "${Info} 用户总流量修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)"
+		echo -e "${Info} 用户总流量修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" 
 	fi
 }
 Modify_config_forbid(){
@@ -818,7 +817,6 @@ Modify_config_all(){
 	Modify_config_speed_limit_per_user
 	Modify_config_transfer
 	Modify_config_forbid
-	ssr
 }
 Check_python(){
 	python_ver=`python -h`
@@ -1185,12 +1183,175 @@ View_everyUser(){
 	done
 }
 # 我自己加的一个循环修改密码
-Set_config_mepassword(){
+Modify_config_uupassword(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -k "${ssr_password}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户密码修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uupassword
+	else
+		echo -e "${Info} 用户密码修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uupassword
+	fi
+}
+Set_config_uupassword(){
 while true
 	do
         View_onlyUser
 		Set_config_password
-		Modify_config_password
+		Modify_config_uupassword
+	done
+}
+# 我自己加的一个循环修改加密方式
+Modify_config_uumethod(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -m "${ssr_method}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户加密方式修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uumethod
+	else
+		echo -e "${Info} 用户加密方式修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uumethod
+	fi
+}
+Set_config_uumethod(){
+while true
+	do
+        Modify_port
+		Set_config_method
+		Modify_config_uumethod
+	done
+}
+# 我自己加的一个循环修改协议插件
+Modify_config_uuprotocol(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -O "${ssr_protocol}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户协议修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuprotocol
+	else
+		echo -e "${Info} 用户协议修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuprotocol
+	fi
+}
+Set_config_uuprotocol(){
+while true
+	do
+        Modify_port
+		Set_config_protocol
+		Modify_config_uuprotocol
+	done
+}
+# 我自己加的一个循环修改混淆插件
+Modify_config_uuobfs(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -o "${ssr_obfs}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户混淆修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuobfs
+	else
+		echo -e "${Info} 用户混淆修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuobfs
+	fi
+}
+Set_config_uuobfs(){
+while true
+	do
+        Modify_port
+		Set_config_obfs
+		Modify_config_uuobfs
+	done
+}
+# 我自己加的一个循环修改设备数限制
+Modify_config_uuprotocol_param(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -G "${ssr_protocol_param}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户协议参数(设备数限制)修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuprotocol_param
+	else
+		echo -e "${Info} 用户议参数(设备数限制)修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuprotocol_param
+	fi
+}
+Set_config_uuprotocol_param(){
+while true
+	do
+        Modify_port
+		Set_config_protocol_param
+		Modify_config_uuprotocol_param
+	done
+}
+# 我自己加的一个循环修改单线程限速
+Modify_config_uuspeed_limit_per_con(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -s "${ssr_speed_limit_per_con}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户单线程限速修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuspeed_limit_per_con
+	else
+		echo -e "${Info} 用户单线程限速修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuspeed_limit_per_con
+	fi
+}
+Set_config_uuspeed_limit_per_con(){
+while true
+	do
+        Modify_port
+		Set_config_speed_limit_per_con
+		Modify_config_uuspeed_limit_per_con
+	done
+}
+# 我自己加的一个循环修改用户总限速
+Modify_config_uuspeed_limit_per_user(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -S "${ssr_speed_limit_per_user}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户端口总限速修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuspeed_limit_per_user
+	else
+		echo -e "${Info} 用户端口总限速修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuspeed_limit_per_user
+	fi
+}
+Set_config_uuspeed_limit_per_user(){
+while true
+	do
+        Modify_port
+		Set_config_speed_limit_per_user
+		Modify_config_uuspeed_limit_per_user
+	done
+}
+# 我自己加的一个循环修改用户总流量
+Modify_config_uutransfer(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -t "${ssr_transfer}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户总流量修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uutransfer
+	else
+		echo -e "${Info} 用户总流量修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uutransfer
+	fi
+}
+Set_config_uutransfer(){
+while true
+	do
+        Modify_port
+		Set_config_transfer
+		Modify_config_uutransfer
+	done
+}
+# 我自己加的一个循环修改用户禁用端口
+Modify_config_uuforbid(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -f "${ssr_forbid}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户禁止访问端口修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuforbid
+	else
+		echo -e "${Info} 用户禁止访问端口修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuforbid
+	fi
+}
+Set_config_uuforbid(){
+while true
+	do
+        Modify_port
+		Set_config_forbid
+		Modify_config_uuforbid
+	done
+}
+# 我自己加的一个循环修改全部配置
+Set_config_uuall(){
+while true
+	do
+        Modify_port
+		Set_config_all "Modify"
+		Modify_config_all
+		Set_config_uuall
+	done
+}
+# 我自己加的一个循环修改用户配置中显示的IP或域名
+Set_config_uuserver_pub_addr(){
+while true
+	do
+        Set_user_api_server_pub_addr "Modify"
+		Modify_user_api_server_pub_addr
+		Set_config_uuserver_pub_addr
 	done
 }
 Modify_Config(){
@@ -1220,48 +1381,27 @@ Modify_Config(){
 	elif [[ ${ssr_modify} == "2" ]]; then
 		Del_port_user
 	elif [[ ${ssr_modify} == "3" ]]; then
-		View_onlyUser
-		Set_config_password
-		Modify_config_password
+		Set_config_uupassword
 	elif [[ ${ssr_modify} == "4" ]]; then
-		Modify_port
-		Set_config_method
-		Modify_config_method
+		Set_config_uumethod
 	elif [[ ${ssr_modify} == "5" ]]; then
-		Modify_port
-		Set_config_protocol
-		Modify_config_protocol
+		Set_config_uuprotocol
 	elif [[ ${ssr_modify} == "6" ]]; then
-		Modify_port
-		Set_config_obfs
-		Modify_config_obfs
+		Set_config_uuobfs
 	elif [[ ${ssr_modify} == "7" ]]; then
-		Modify_port
-		Set_config_protocol_param
-		Modify_config_protocol_param
+		Set_config_uuprotocol_param
 	elif [[ ${ssr_modify} == "8" ]]; then
-		Modify_port
-		Set_config_speed_limit_per_con
-		Modify_config_speed_limit_per_con
+		Set_config_uuspeed_limit_per_con
 	elif [[ ${ssr_modify} == "9" ]]; then
-		Modify_port
-		Set_config_speed_limit_per_user
-		Modify_config_speed_limit_per_user
+		Set_config_uuspeed_limit_per_user
 	elif [[ ${ssr_modify} == "10" ]]; then
-		Modify_port
-		Set_config_transfer
-		Modify_config_transfer
+		Set_config_uutransfer
 	elif [[ ${ssr_modify} == "11" ]]; then
-		Modify_port
-		Set_config_forbid
-		Modify_config_forbid
+		Set_config_uuforbid
 	elif [[ ${ssr_modify} == "12" ]]; then
-		Modify_port
-		Set_config_all "Modify"
-		Modify_config_all
+		Set_config_uuall
 	elif [[ ${ssr_modify} == "13" ]]; then
-		Set_user_api_server_pub_addr "Modify"
-		Modify_user_api_server_pub_addr
+		Set_config_uuserver_pub_addr
 	else
 		echo -e "${Error} 请输入正确的数字(1-13)" && exit 1
 	fi
@@ -1293,33 +1433,24 @@ Add_port_user(){
 		do
 			Set_config_all
 			match_port=$(python mujson_mgr.py -l|grep -w "port ${ssr_port}$")
-			[[ ! -z "${match_port}" ]] && echo -e "${Error} 该端口 [${ssr_port}] 已存在，请勿重复添加 !" && exit 1
+			[[ ! -z "${match_port}" ]] && echo -e "${Error} 该端口 [${ssr_port}] 已存在，请勿重复添加 !" && Add_port_user
 			match_username=$(python mujson_mgr.py -l|grep -w "user \[${ssr_user}]")
-			[[ ! -z "${match_username}" ]] && echo -e "${Error} 该用户名 [${ssr_user}] 已存在，请勿重复添加 !" && exit 1
+			[[ ! -z "${match_username}" ]] && echo -e "${Error} 该用户名 [${ssr_user}] 已存在，请勿重复添加 !" && Add_port_user
 			match_add=$(python mujson_mgr.py -a -u "${ssr_user}" -p "${ssr_port}" -k "${ssr_password}" -m "${ssr_method}" -O "${ssr_protocol}" -G "${ssr_protocol_param}" -o "${ssr_obfs}" -s "${ssr_speed_limit_per_con}" -S "${ssr_speed_limit_per_user}" -t "${ssr_transfer}" -f "${ssr_forbid}"|grep -w "add user info")
 			if [[ -z "${match_add}" ]]; then
-				echo -e "${Error} 用户添加失败 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} "
+				echo -e "${Error} 用户添加失败 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} " && Add_port_user
 				break
 			else
 				Add_iptables
 				Save_iptables
-				echo -e "${Info} 用户添加成功 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} "
-				echo
-				stty erase '^H' && read -p "是否继续 添加用户配置？[Y/n]:" addyn
-				[[ -z ${addyn} ]] && addyn="y"
-				if [[ ${addyn} == [Nn] ]]; then
-					Get_User_info "${ssr_port}"
-					View_User_info
-					break
-				else
-					echo -e "${Info} 继续 添加用户配置..."
-				fi
+				echo -e "${Info} 用户添加成功 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} " 
+				Get_User_info "${ssr_port}"
+				View_User_info && Add_port_user
 			fi
 		done
 	fi
 }
 Del_port_user(){
-	List_port_user
 	while true
 	do
 		echo -e "请输入要删除的用户 端口"
@@ -1336,7 +1467,7 @@ Del_port_user(){
 				Save_iptables
 				echo -e "${Info} 用户删除成功 ${Green_font_prefix}[端口: ${del_user_port}]${Font_color_suffix} "
 			fi
-			break
+			/usr/local/bin/ssr
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
@@ -1364,6 +1495,7 @@ Clear_transfer(){
 	[[ -z "${ssr_modify}" ]] && echo "已取消..." && exit 1
 	if [[ ${ssr_modify} == "1" ]]; then
 		Clear_transfer_one
+		Clear_transfer
 	elif [[ ${ssr_modify} == "2" ]]; then
 		echo "确定要 清零 所有用户已使用流量？[y/N]" && echo
 		stty erase '^H' && read -p "(默认: n):" yn
