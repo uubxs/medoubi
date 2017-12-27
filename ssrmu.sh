@@ -6,8 +6,8 @@ export PATH
 #	System Required: CentOS 6+/Debian 6+/Ubuntu 14.04+
 #	Description: Install the ShadowsocksR mudbjson server
 #	Version: 1.0.24
-#	Author: Toyo
-#	Blog: https://doub.io/ss-jc60/
+#	Author: Uubxs
+#	Blog: https://uubxs.net
 #=================================================
 
 sh_ver="1.0.24"
@@ -72,7 +72,7 @@ BBR_installation_status(){
 	if [[ ! -e ${BBR_file} ]]; then
 		echo -e "${Error} 没有发现 BBR脚本，开始下载..."
 		cd "${file}"
-		if ! wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/bbr.sh; then
+		if ! wget -N --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/bbr.sh; then
 			echo -e "${Error} BBR 脚本下载失败 !" && exit 1
 		else
 			echo -e "${Info} BBR 脚本下载完成 !"
@@ -333,12 +333,12 @@ View_User(){
 	do
 		echo -e "请输入要查看账号信息的用户 端口"
 		stty erase '^H' && read -p "(默认: 取消):" View_user_port
-		[[ -z "${View_user_port}" ]] && echo -e "已取消..." && exit 1
+		[[ -z "${View_user_port}" ]] && echo -e "已取消..." && ssr
 		View_user=$(cat "${config_user_mudb_file}"|grep '"port": '"${View_user_port}"',')
 		if [[ ! -z ${View_user} ]]; then
 			Get_User_info "${View_user_port}"
 			View_User_info
-			break
+			View_everyUser
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
@@ -374,8 +374,8 @@ View_User_info(){
 # 设置 配置信息
 Set_config_user(){
 	echo "请输入要设置的用户 用户名(请勿重复, 用于区分, 不支持中文, 会报错 !)"
-	stty erase '^H' && read -p "(默认: doubi):" ssr_user
-	[[ -z "${ssr_user}" ]] && ssr_user="doubi"
+	stty erase '^H' && read -p "(默认: uubxs):" ssr_user
+	[[ -z "${ssr_user}" ]] && ssr_user="uubxs"
 	echo && echo ${Separator_1} && echo -e "	用户名 : ${Green_font_prefix}${ssr_user}${Font_color_suffix}" && echo ${Separator_1} && echo
 }
 Set_config_port(){
@@ -399,8 +399,8 @@ Set_config_port(){
 }
 Set_config_password(){
 	echo "请输入要设置的用户 密码"
-	stty erase '^H' && read -p "(默认: doub.io):" ssr_password
-	[[ -z "${ssr_password}" ]] && ssr_password="doub.io"
+	stty erase '^H' && read -p "(默认: uubxs.net):" ssr_password
+	[[ -z "${ssr_password}" ]] && ssr_password="uubxs.net"
 	echo && echo ${Separator_1} && echo -e "	密码 : ${Green_font_prefix}${ssr_password}${Font_color_suffix}" && echo ${Separator_1} && echo
 }
 Set_config_method(){
@@ -428,8 +428,8 @@ Set_config_method(){
  ${Green_font_prefix}15.${Font_color_suffix} chacha20
  ${Green_font_prefix}16.${Font_color_suffix} chacha20-ietf
  ${Tip} salsa20/chacha20-*系列加密方式，需要额外安装依赖 libsodium ，否则会无法启动ShadowsocksR !" && echo
-	stty erase '^H' && read -p "(默认: 5. aes-128-ctr):" ssr_method
-	[[ -z "${ssr_method}" ]] && ssr_method="5"
+	stty erase '^H' && read -p "(默认: 10. aes-256-cfb):" ssr_method
+	[[ -z "${ssr_method}" ]] && ssr_method="10"
 	if [[ ${ssr_method} == "1" ]]; then
 		ssr_method="none"
 	elif [[ ${ssr_method} == "2" ]]; then
@@ -476,8 +476,8 @@ Set_config_protocol(){
  ${Green_font_prefix}5.${Font_color_suffix} auth_chain_a
  ${Green_font_prefix}6.${Font_color_suffix} auth_chain_b
  ${Tip} 如果使用 auth_chain_* 系列协议，建议加密方式选择 none (该系列协议自带 RC4 加密)，混淆随意" && echo
-	stty erase '^H' && read -p "(默认: 3. auth_aes128_md5):" ssr_protocol
-	[[ -z "${ssr_protocol}" ]] && ssr_protocol="3"
+	stty erase '^H' && read -p "(默认: 1. origin):" ssr_protocol
+	[[ -z "${ssr_protocol}" ]] && ssr_protocol="1"
 	if [[ ${ssr_protocol} == "1" ]]; then
 		ssr_protocol="origin"
 	elif [[ ${ssr_protocol} == "2" ]]; then
@@ -512,8 +512,8 @@ Set_config_obfs(){
  ${Green_font_prefix}5.${Font_color_suffix} tls1.2_ticket_auth
  ${Tip} 如果使用 ShadowsocksR 代理游戏，建议选择 混淆兼容原版或 plain 混淆，然后客户端选择 plain，否则会增加延迟 !
  另外, 如果你选择了 tls1.2_ticket_auth，那么客户端可以选择 tls1.2_ticket_fastauth，这样即能伪装特征 又不会增加延迟 !" && echo
-	stty erase '^H' && read -p "(默认: 5. tls1.2_ticket_auth):" ssr_obfs
-	[[ -z "${ssr_obfs}" ]] && ssr_obfs="5"
+	stty erase '^H' && read -p "(默认: 1. plain):" ssr_obfs
+	[[ -z "${ssr_obfs}" ]] && ssr_obfs="1"
 	if [[ ${ssr_obfs} == "1" ]]; then
 		ssr_obfs="plain"
 	elif [[ ${ssr_obfs} == "2" ]]; then
@@ -540,8 +540,8 @@ Set_config_protocol_param(){
 	do
 	echo -e "请输入要设置的用户 欲限制的设备数 (${Green_font_prefix} auth_* 系列协议 不兼容原版才有效 ${Font_color_suffix})"
 	echo -e "${Tip} 设备数限制：每个端口同一时间能链接的客户端数量(多端口模式，每个端口都是独立计算)，建议最少 2个。"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_protocol_param
-	[[ -z "$ssr_protocol_param" ]] && ssr_protocol_param="" && echo && break
+	stty erase '^H' && read -p "(默认: 2):" ssr_protocol_param
+	[[ -z "$ssr_protocol_param" ]] && ssr_protocol_param="2" && echo && break
 	expr ${ssr_protocol_param} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_protocol_param} -ge 1 ]] && [[ ${ssr_protocol_param} -le 9999 ]]; then
@@ -560,8 +560,8 @@ Set_config_speed_limit_per_con(){
 	do
 	echo -e "请输入要设置的用户 单线程 限速上限(单位：KB/S)"
 	echo -e "${Tip} 单线程限速：每个端口 单线程的限速上限，多线程即无效。"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_speed_limit_per_con
-	[[ -z "$ssr_speed_limit_per_con" ]] && ssr_speed_limit_per_con=0 && echo && break
+	stty erase '^H' && read -p "(默认: 3800):" ssr_speed_limit_per_con
+	[[ -z "$ssr_speed_limit_per_con" ]] && ssr_speed_limit_per_con="3800" && echo && break
 	expr ${ssr_speed_limit_per_con} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_speed_limit_per_con} -ge 1 ]] && [[ ${ssr_speed_limit_per_con} -le 131072 ]]; then
@@ -581,8 +581,8 @@ Set_config_speed_limit_per_user(){
 	echo
 	echo -e "请输入要设置的用户 总速度 限速上限(单位：KB/S)"
 	echo -e "${Tip} 端口总限速：每个端口 总速度 限速上限，单个端口整体限速。"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_speed_limit_per_user
-	[[ -z "$ssr_speed_limit_per_user" ]] && ssr_speed_limit_per_user=0 && echo && break
+	stty erase '^H' && read -p "(默认: 3800):" ssr_speed_limit_per_user
+	[[ -z "$ssr_speed_limit_per_user" ]] && ssr_speed_limit_per_user="3800" && echo && break
 	expr ${ssr_speed_limit_per_user} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_speed_limit_per_user} -ge 1 ]] && [[ ${ssr_speed_limit_per_user} -le 131072 ]]; then
@@ -601,8 +601,8 @@ Set_config_transfer(){
 	do
 	echo
 	echo -e "请输入要设置的用户 可使用的总流量上限(单位: GB, 1-838868 GB)"
-	stty erase '^H' && read -p "(默认: 无限):" ssr_transfer
-	[[ -z "$ssr_transfer" ]] && ssr_transfer="838868" && echo && break
+	stty erase '^H' && read -p "(默认: 50):" ssr_transfer
+	[[ -z "$ssr_transfer" ]] && ssr_transfer="50" && echo && break
 	expr ${ssr_transfer} + 0 &>/dev/null
 	if [[ $? == 0 ]]; then
 		if [[ ${ssr_transfer} -ge 1 ]] && [[ ${ssr_transfer} -le 838868 ]]; then
@@ -709,7 +709,7 @@ Set_config_all(){
 		Set_config_speed_limit_per_con
 		Set_config_speed_limit_per_user
 		Set_config_transfer
-		Set_config_forbid
+		#Set_config_forbid
 	else
 		Set_config_user
 		Set_config_port
@@ -721,7 +721,7 @@ Set_config_all(){
 		Set_config_speed_limit_per_con
 		Set_config_speed_limit_per_user
 		Set_config_transfer
-		Set_config_forbid
+		#Set_config_forbid
 	fi
 }
 # 修改 配置信息
@@ -789,7 +789,7 @@ Modify_config_transfer(){
 	if [[ -z "${match_edit}" ]]; then
 		echo -e "${Error} 用户总流量修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && exit 1
 	else
-		echo -e "${Info} 用户总流量修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)"
+		echo -e "${Info} 用户总流量修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" 
 	fi
 }
 Modify_config_forbid(){
@@ -802,6 +802,7 @@ Modify_config_forbid(){
 }
 Modify_config_enable(){
 	sed -i "${ssr_enable_num}"'s/"enable": '"$(echo ${enable})"',/"enable": '"$(echo ${ssr_enable})"',/' ${config_user_mudb_file}
+	ssr
 }
 Modify_user_api_server_pub_addr(){
 	sed -i "s/SERVER_PUB_ADDR = '${server_pub_addr}'/SERVER_PUB_ADDR = '${ssr_server_pub_addr}'/" ${config_user_api_file}
@@ -844,9 +845,9 @@ Debian_apt(){
 # 下载 ShadowsocksR
 Download_SSR(){
 	cd "/usr/local"
-	wget -N --no-check-certificate "https://github.com/ToyoDAdoubi/shadowsocksr/archive/manyuser.zip"
+	wget -N --no-check-certificate "https://github.com/uubxs/shadowsocksr/archive/manyuser.zip"
 	#git config --global http.sslVerify false
-	#env GIT_SSL_NO_VERIFY=true git clone -b manyuser https://github.com/ToyoDAdoubi/shadowsocksr.git
+	#env GIT_SSL_NO_VERIFY=true git clone -b manyuser https://github.com/uubxs/shadowsocksr.git
 	#[[ ! -e ${ssr_folder} ]] && echo -e "${Error} ShadowsocksR服务端 下载失败 !" && exit 1
 	[[ ! -e "manyuser.zip" ]] && echo -e "${Error} ShadowsocksR服务端 压缩包 下载失败 !" && rm -rf manyuser.zip && exit 1
 	unzip "manyuser.zip"
@@ -868,14 +869,17 @@ Download_SSR(){
 }
 Service_SSR(){
 	if [[ ${release} = "centos" ]]; then
-		if ! wget --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/other/ssrmu_centos -O /etc/init.d/ssrmu; then
+		if ! wget --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/other/ssrmu_centos -O /etc/init.d/ssrmu; then
 			echo -e "${Error} ShadowsocksR服务 管理脚本下载失败 !" && exit 1
 		fi
 		chmod +x /etc/init.d/ssrmu
+		#Install SSR-Bash Background
+        wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
+        chmod +x /usr/local/bin/ssr
 		chkconfig --add ssrmu
 		chkconfig ssrmu on
 	else
-		if ! wget --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/other/ssrmu_debian -O /etc/init.d/ssrmu; then
+		if ! wget --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/other/ssrmu_debian -O /etc/init.d/ssrmu; then
 			echo -e "${Error} ShadowsocksR服务 管理脚本下载失败 !" && exit 1
 		fi
 		chmod +x /etc/init.d/ssrmu
@@ -1128,9 +1132,25 @@ get_IP_address(){
 		done
 	fi
 }
+# 我自己多加的一个只看单个配置信息
+View_onlyUser(){
+	while true
+	do
+		echo -e "请输入要修改的用户 端口"
+		stty erase '^H' && read -p "(默认: 取消):" ssr_port
+		[[ -z "${ssr_port}" ]] && echo -e "已取消..." && ssr
+		View_onlyUser=$(cat "${config_user_mudb_file}"|grep '"port": '"${ssr_port}"',')
+		if [[ ! -z ${View_onlyUser} ]]; then
+			Get_User_info "${ssr_port}"
+			View_User_info
+			break
+		else
+			echo -e "${Error} 请输入正确的端口 !"
+		fi
+	done
+}
 # 修改 用户配置
 Modify_port(){
-	List_port_user
 	while true
 	do
 		echo -e "请输入要修改的用户 端口"
@@ -1144,12 +1164,211 @@ Modify_port(){
 		fi
 	done
 }
+# 我自己加的一个循环查看用户信息
+View_everyUser(){
+	SSR_installation_status
+	while true
+	do
+		echo -e "请输入要查看账号信息的用户 端口"
+		stty erase '^H' && read -p "(默认: 取消):" View_user_port
+		[[ -z "${View_user_port}" ]] && echo -e "已取消..." && ssr
+		View_everyUser=$(cat "${config_user_mudb_file}"|grep '"port": '"${View_user_port}"',')
+		if [[ ! -z ${View_everyUser} ]]; then
+			Get_User_info "${View_user_port}"
+			View_User_info
+			View_everyUser
+		else
+			echo -e "${Error} 请输入正确的端口 !"
+		fi
+	done
+}
+# 我自己加的一个循环修改密码
+Modify_config_uupassword(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -k "${ssr_password}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户密码修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uupassword
+	else
+		echo -e "${Info} 用户密码修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uupassword
+	fi
+}
+Set_config_uupassword(){
+while true
+	do
+        View_onlyUser
+		Set_config_password
+		Modify_config_uupassword
+	done
+}
+# 我自己加的一个循环修改加密方式
+Modify_config_uumethod(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -m "${ssr_method}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户加密方式修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uumethod
+	else
+		echo -e "${Info} 用户加密方式修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uumethod
+	fi
+}
+Set_config_uumethod(){
+while true
+	do
+        Modify_port
+		Set_config_method
+		Modify_config_uumethod
+	done
+}
+# 我自己加的一个循环修改协议插件
+Modify_config_uuprotocol(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -O "${ssr_protocol}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户协议修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuprotocol
+	else
+		echo -e "${Info} 用户协议修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuprotocol
+	fi
+}
+Set_config_uuprotocol(){
+while true
+	do
+        Modify_port
+		Set_config_protocol
+		Modify_config_uuprotocol
+	done
+}
+# 我自己加的一个循环修改混淆插件
+Modify_config_uuobfs(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -o "${ssr_obfs}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户混淆修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuobfs
+	else
+		echo -e "${Info} 用户混淆修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuobfs
+	fi
+}
+Set_config_uuobfs(){
+while true
+	do
+        Modify_port
+		Set_config_obfs
+		Modify_config_uuobfs
+	done
+}
+# 我自己加的一个循环修改设备数限制
+Modify_config_uuprotocol_param(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -G "${ssr_protocol_param}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户协议参数(设备数限制)修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuprotocol_param
+	else
+		echo -e "${Info} 用户议参数(设备数限制)修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuprotocol_param
+	fi
+}
+Set_config_uuprotocol_param(){
+while true
+	do
+        Modify_port
+		Set_config_protocol_param
+		Modify_config_uuprotocol_param
+	done
+}
+# 我自己加的一个循环修改单线程限速
+Modify_config_uuspeed_limit_per_con(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -s "${ssr_speed_limit_per_con}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户单线程限速修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuspeed_limit_per_con
+	else
+		echo -e "${Info} 用户单线程限速修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuspeed_limit_per_con
+	fi
+}
+Set_config_uuspeed_limit_per_con(){
+while true
+	do
+        Modify_port
+		Set_config_speed_limit_per_con
+		Modify_config_uuspeed_limit_per_con
+	done
+}
+# 我自己加的一个循环修改用户总限速
+Modify_config_uuspeed_limit_per_user(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -S "${ssr_speed_limit_per_user}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户端口总限速修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuspeed_limit_per_user
+	else
+		echo -e "${Info} 用户端口总限速修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuspeed_limit_per_user
+	fi
+}
+Set_config_uuspeed_limit_per_user(){
+while true
+	do
+        Modify_port
+		Set_config_speed_limit_per_user
+		Modify_config_uuspeed_limit_per_user
+	done
+}
+# 我自己加的一个循环修改用户总流量
+Modify_config_uutransfer(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -t "${ssr_transfer}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户总流量修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uutransfer
+	else
+		echo -e "${Info} 用户总流量修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uutransfer
+	fi
+}
+Set_config_uutransfer(){
+while true
+	do
+        Modify_port
+		Set_config_transfer
+		Modify_config_uutransfer
+	done
+}
+# 我自己加的一个循环修改用户禁用端口
+Modify_config_uuforbid(){
+	match_edit=$(python mujson_mgr.py -e -p "${ssr_port}" -f "${ssr_forbid}"|grep -w "edit user ")
+	if [[ -z "${match_edit}" ]]; then
+		echo -e "${Error} 用户禁止访问端口修改失败 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} " && Set_config_uuforbid
+	else
+		echo -e "${Info} 用户禁止访问端口修改成功 ${Green_font_prefix}[端口: ${ssr_port}]${Font_color_suffix} (注意：可能需要十秒左右才会应用最新配置)" && Set_config_uuforbid
+	fi
+}
+Set_config_uuforbid(){
+while true
+	do
+        Modify_port
+		Set_config_forbid
+		Modify_config_uuforbid
+	done
+}
+# 我自己加的一个循环修改全部配置
+Set_config_uuall(){
+while true
+	do
+        Modify_port
+		Set_config_all "Modify"
+		Modify_config_all
+		Set_config_uuall
+	done
+}
+# 我自己加的一个循环修改用户配置中显示的IP或域名
+Set_config_uuserver_pub_addr(){
+while true
+	do
+        Set_user_api_server_pub_addr "Modify"
+		Modify_user_api_server_pub_addr
+		Set_config_uuserver_pub_addr
+	done
+}
+# 我自己加的一个自动重启服务器功能
+crontab_uurestart(){
+crontab -l > "crontab.bak"
+sed -i "/ssrmu restart/d" "crontab.bak"
+echo -e "\n28 8 * * * /bin/bash /etc/init.d/ssrmu restart" >> "crontab.bak"
+crontab "crontab.bak"
+rm -r "crontab.bak"
+echo -e "${Info} 定时：每天4点10重启服务器成功 " && /root/ssrmu.sh
+}
 Modify_Config(){
 	SSR_installation_status
 	echo && echo -e "你要做什么？
  ${Green_font_prefix}1.${Font_color_suffix}  添加 用户配置
  ${Green_font_prefix}2.${Font_color_suffix}  删除 用户配置
-————— 修改 用户配置 —————
+———————————————
  ${Green_font_prefix}3.${Font_color_suffix}  修改 用户密码
  ${Green_font_prefix}4.${Font_color_suffix}  修改 加密方式
  ${Green_font_prefix}5.${Font_color_suffix}  修改 协议插件
@@ -1165,54 +1384,33 @@ Modify_Config(){
  
  ${Tip} 用户的用户名和端口是无法修改，如果需要修改请使用脚本的 手动修改功能 !" && echo
 	stty erase '^H' && read -p "(默认: 取消):" ssr_modify
-	[[ -z "${ssr_modify}" ]] && echo "已取消..." && exit 1
+	[[ -z "${ssr_modify}" ]] && echo "已取消..." && ssr
 	if [[ ${ssr_modify} == "1" ]]; then
 		Add_port_user
 	elif [[ ${ssr_modify} == "2" ]]; then
 		Del_port_user
 	elif [[ ${ssr_modify} == "3" ]]; then
-		Modify_port
-		Set_config_password
-		Modify_config_password
+		Set_config_uupassword
 	elif [[ ${ssr_modify} == "4" ]]; then
-		Modify_port
-		Set_config_method
-		Modify_config_method
+		Set_config_uumethod
 	elif [[ ${ssr_modify} == "5" ]]; then
-		Modify_port
-		Set_config_protocol
-		Modify_config_protocol
+		Set_config_uuprotocol
 	elif [[ ${ssr_modify} == "6" ]]; then
-		Modify_port
-		Set_config_obfs
-		Modify_config_obfs
+		Set_config_uuobfs
 	elif [[ ${ssr_modify} == "7" ]]; then
-		Modify_port
-		Set_config_protocol_param
-		Modify_config_protocol_param
+		Set_config_uuprotocol_param
 	elif [[ ${ssr_modify} == "8" ]]; then
-		Modify_port
-		Set_config_speed_limit_per_con
-		Modify_config_speed_limit_per_con
+		Set_config_uuspeed_limit_per_con
 	elif [[ ${ssr_modify} == "9" ]]; then
-		Modify_port
-		Set_config_speed_limit_per_user
-		Modify_config_speed_limit_per_user
+		Set_config_uuspeed_limit_per_user
 	elif [[ ${ssr_modify} == "10" ]]; then
-		Modify_port
-		Set_config_transfer
-		Modify_config_transfer
+		Set_config_uutransfer
 	elif [[ ${ssr_modify} == "11" ]]; then
-		Modify_port
-		Set_config_forbid
-		Modify_config_forbid
+		Set_config_uuforbid
 	elif [[ ${ssr_modify} == "12" ]]; then
-		Modify_port
-		Set_config_all "Modify"
-		Modify_config_all
+		Set_config_uuall
 	elif [[ ${ssr_modify} == "13" ]]; then
-		Set_user_api_server_pub_addr "Modify"
-		Modify_user_api_server_pub_addr
+		Set_config_uuserver_pub_addr
 	else
 		echo -e "${Error} 请输入正确的数字(1-13)" && exit 1
 	fi
@@ -1244,33 +1442,24 @@ Add_port_user(){
 		do
 			Set_config_all
 			match_port=$(python mujson_mgr.py -l|grep -w "port ${ssr_port}$")
-			[[ ! -z "${match_port}" ]] && echo -e "${Error} 该端口 [${ssr_port}] 已存在，请勿重复添加 !" && exit 1
+			[[ ! -z "${match_port}" ]] && echo -e "${Error} 该端口 [${ssr_port}] 已存在，请勿重复添加 !" && Add_port_user
 			match_username=$(python mujson_mgr.py -l|grep -w "user \[${ssr_user}]")
-			[[ ! -z "${match_username}" ]] && echo -e "${Error} 该用户名 [${ssr_user}] 已存在，请勿重复添加 !" && exit 1
+			[[ ! -z "${match_username}" ]] && echo -e "${Error} 该用户名 [${ssr_user}] 已存在，请勿重复添加 !" && Add_port_user
 			match_add=$(python mujson_mgr.py -a -u "${ssr_user}" -p "${ssr_port}" -k "${ssr_password}" -m "${ssr_method}" -O "${ssr_protocol}" -G "${ssr_protocol_param}" -o "${ssr_obfs}" -s "${ssr_speed_limit_per_con}" -S "${ssr_speed_limit_per_user}" -t "${ssr_transfer}" -f "${ssr_forbid}"|grep -w "add user info")
 			if [[ -z "${match_add}" ]]; then
-				echo -e "${Error} 用户添加失败 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} "
+				echo -e "${Error} 用户添加失败 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} " && Add_port_user
 				break
 			else
 				Add_iptables
 				Save_iptables
-				echo -e "${Info} 用户添加成功 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} "
-				echo
-				stty erase '^H' && read -p "是否继续 添加用户配置？[Y/n]:" addyn
-				[[ -z ${addyn} ]] && addyn="y"
-				if [[ ${addyn} == [Nn] ]]; then
-					Get_User_info "${ssr_port}"
-					View_User_info
-					break
-				else
-					echo -e "${Info} 继续 添加用户配置..."
-				fi
+				echo -e "${Info} 用户添加成功 ${Green_font_prefix}[用户名: ${ssr_user} , 端口: ${ssr_port}]${Font_color_suffix} " 
+				Get_User_info "${ssr_port}"
+				View_User_info && Add_port_user
 			fi
 		done
 	fi
 }
 Del_port_user(){
-	List_port_user
 	while true
 	do
 		echo -e "请输入要删除的用户 端口"
@@ -1287,7 +1476,7 @@ Del_port_user(){
 				Save_iptables
 				echo -e "${Info} 用户删除成功 ${Green_font_prefix}[端口: ${del_user_port}]${Font_color_suffix} "
 			fi
-			break
+			/usr/local/bin/ssr
 		else
 			echo -e "${Error} 请输入正确的端口 !"
 		fi
@@ -1315,6 +1504,7 @@ Clear_transfer(){
 	[[ -z "${ssr_modify}" ]] && echo "已取消..." && exit 1
 	if [[ ${ssr_modify} == "1" ]]; then
 		Clear_transfer_one
+		Clear_transfer
 	elif [[ ${ssr_modify} == "2" ]]; then
 		echo "确定要 清零 所有用户已使用流量？[y/N]" && echo
 		stty erase '^H' && read -p "(默认: n):" yn
@@ -1339,7 +1529,6 @@ Clear_transfer(){
 	fi
 }
 Clear_transfer_one(){
-	List_port_user
 	while true
 	do
 		echo -e "请输入要清零已使用流量的用户 端口"
@@ -1626,9 +1815,11 @@ Other_functions(){
   ${Green_font_prefix}6.${Font_color_suffix} 切换 ShadowsocksR日志输出模式
   —— 说明：SSR默认只输出错误日志，此项可切换为输出详细的访问日志。
   ${Green_font_prefix}7.${Font_color_suffix} 监控 ShadowsocksR服务端运行状态
-  —— 说明：该功能适合于SSR服务端经常进程结束，启动该功能后会每分钟检测一次，当进程不存在则自动启动SSR服务端。" && echo
+  —— 说明：该功能适合于SSR服务端经常进程结束，启动该功能后会每分钟检测一次，当进程不存在则自动启动SSR服务端。
+  ${Green_font_prefix}8.${Font_color_suffix} 定时重启(待修复！不可用)
+  —— 说明：定时4点10分重启。" && echo
 	stty erase '^H' && read -p "(默认: 取消):" other_num
-	[[ -z "${other_num}" ]] && echo "已取消..." && exit 1
+	[[ -z "${other_num}" ]] && echo "已取消..." && ssr
 	if [[ ${other_num} == "1" ]]; then
 		Configure_BBR
 	elif [[ ${other_num} == "2" ]]; then
@@ -1643,18 +1834,20 @@ Other_functions(){
 		Set_config_connect_verbose_info
 	elif [[ ${other_num} == "7" ]]; then
 		Set_crontab_monitor_ssr
+	elif [[ ${other_num} == "8" ]]; then
+		crontab_uurestart
 	else
 		echo -e "${Error} 请输入正确的数字 [1-7]" && exit 1
 	fi
 }
 # 封禁 BT PT SPAM
 BanBTPTSPAM(){
-	wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh banall
+	wget -N --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh banall
 	rm -rf ban_iptables.sh
 }
 # 解封 BT PT SPAM
 UnBanBTPTSPAM(){
-	wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh unbanall
+	wget -N --no-check-certificate https://raw.githubusercontent.com/uubxs/medoubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh unbanall
 	rm -rf ban_iptables.sh
 }
 Set_config_connect_verbose_info(){
@@ -1804,16 +1997,16 @@ else
 	echo -e "  ShadowsocksR MuJSON一键管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
   ---- Toyo | doub.io/ss-jc60 ----
 
-  ${Green_font_prefix}1.${Font_color_suffix} 安装 ShadowsocksR
-  ${Green_font_prefix}2.${Font_color_suffix} 更新 ShadowsocksR
-  ${Green_font_prefix}3.${Font_color_suffix} 卸载 ShadowsocksR
-  ${Green_font_prefix}4.${Font_color_suffix} 安装 libsodium(chacha20)
+  ${Green_font_prefix}1.${Font_color_suffix} 查看 个人用户
+  ${Green_font_prefix}2.${Font_color_suffix} 设置 用户配置
+  ${Green_font_prefix}3.${Font_color_suffix} 显示 连接信息
+  ${Green_font_prefix}4.${Font_color_suffix} 手动 修改配置
+  ${Green_font_prefix}5.${Font_color_suffix} 清零 已用流量
+  ${Green_font_prefix}6.${Font_color_suffix} 查看 全部用户
 ————————————
-  ${Green_font_prefix}5.${Font_color_suffix} 查看 账号信息
-  ${Green_font_prefix}6.${Font_color_suffix} 显示 连接信息
-  ${Green_font_prefix}7.${Font_color_suffix} 设置 用户配置
-  ${Green_font_prefix}8.${Font_color_suffix} 手动 修改配置
-  ${Green_font_prefix}9.${Font_color_suffix} 清零 已用流量
+  ${Green_font_prefix}7.${Font_color_suffix} 安装 ShadowsocksR
+  ${Green_font_prefix}8.${Font_color_suffix} 卸载 ShadowsocksR
+  ${Green_font_prefix}9.${Font_color_suffix} 安装 libsodium(chacha20)
 ————————————
  ${Green_font_prefix}10.${Font_color_suffix} 启动 ShadowsocksR
  ${Green_font_prefix}11.${Font_color_suffix} 停止 ShadowsocksR
@@ -1827,31 +2020,31 @@ else
 	echo && stty erase '^H' && read -p "请输入数字 [1-15]：" num
 case "$num" in
 	1)
-	Install_SSR
+	View_everyUser  
 	;;
 	2)
-	Update_SSR
-	;;
-	3)
-	Uninstall_SSR
-	;;
-	4)
-	Install_Libsodium
-	;;
-	5)
-	View_User
-	;;
-	6)
-	View_user_connection_info
-	;;
-	7)
 	Modify_Config
 	;;
-	8)
+	3)
+	View_user_connection_info
+	;;
+	4)
 	Manually_Modify_Config
 	;;
-	9)
+	5)
 	Clear_transfer
+	;;
+	6)
+	View_User
+	;;
+	7)
+    Install_SSR
+	;;
+	8)
+	Uninstall_SSR
+	;;
+	9)
+	Install_Libsodium
 	;;
 	10)
 	Start_SSR
