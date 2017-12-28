@@ -6,8 +6,8 @@ export PATH
 #	System Required: CentOS 6+/Debian 6+/Ubuntu 14.04+
 #	Description: Install the ShadowsocksR mudbjson server
 #	Version: 1.0.24
-#	Author: Uubxs
-#	Blog: https://uubxs.net
+#	Author: Toyo
+#	Blog: https://doub.io/ss-jc60/
 #=================================================
 
 sh_ver="1.0.24"
@@ -1354,15 +1354,6 @@ while true
 		Set_config_uuserver_pub_addr
 	done
 }
-# 我自己加的一个自动重启服务器功能
-crontab_uurestart(){
-crontab -l > "crontab.bak"
-sed -i "/ssrmu restart/d" "crontab.bak"
-echo -e "\n28 8 * * * /bin/bash /etc/init.d/ssrmu restart" >> "crontab.bak"
-crontab "crontab.bak"
-rm -r "crontab.bak"
-echo -e "${Info} 定时：每天4点10重启服务器成功 " && /root/ssrmu.sh
-}
 Modify_Config(){
 	SSR_installation_status
 	echo && echo -e "你要做什么？
@@ -1815,9 +1806,7 @@ Other_functions(){
   ${Green_font_prefix}6.${Font_color_suffix} 切换 ShadowsocksR日志输出模式
   —— 说明：SSR默认只输出错误日志，此项可切换为输出详细的访问日志。
   ${Green_font_prefix}7.${Font_color_suffix} 监控 ShadowsocksR服务端运行状态
-  —— 说明：该功能适合于SSR服务端经常进程结束，启动该功能后会每分钟检测一次，当进程不存在则自动启动SSR服务端。
-  ${Green_font_prefix}8.${Font_color_suffix} 定时重启(待修复！不可用)
-  —— 说明：定时4点10分重启。" && echo
+  —— 说明：该功能适合于SSR服务端经常进程结束，启动该功能后会每分钟检测一次，当进程不存在则自动启动SSR服务端。" && echo
 	stty erase '^H' && read -p "(默认: 取消):" other_num
 	[[ -z "${other_num}" ]] && echo "已取消..." && ssr
 	if [[ ${other_num} == "1" ]]; then
@@ -1834,8 +1823,6 @@ Other_functions(){
 		Set_config_connect_verbose_info
 	elif [[ ${other_num} == "7" ]]; then
 		Set_crontab_monitor_ssr
-	elif [[ ${other_num} == "8" ]]; then
-		crontab_uurestart
 	else
 		echo -e "${Error} 请输入正确的数字 [1-7]" && exit 1
 	fi
