@@ -1993,7 +1993,7 @@ else
 ————————————
   ${Green_font_prefix}7.${Font_color_suffix} 安装 ShadowsocksR
   ${Green_font_prefix}8.${Font_color_suffix} 卸载 ShadowsocksR
-  ${Green_font_prefix}9.${Font_color_suffix} 安装 libsodium(chacha20)
+  ${Green_font_prefix}9.${Font_color_suffix} 安装 libsodium(chacha20)【改成输入56就可以安装】
 ————————————
  ${Green_font_prefix}10.${Font_color_suffix} 启动 ShadowsocksR
  ${Green_font_prefix}11.${Font_color_suffix} 停止 ShadowsocksR
@@ -2030,7 +2030,7 @@ case "$num" in
 	8)
 	Uninstall_SSR
 	;;
-	9)
+	56)
 	Install_Libsodium
 	;;
 	10)
