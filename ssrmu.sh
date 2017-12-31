@@ -328,7 +328,7 @@ ss_ssr_determine(){
 # 显示 配置信息
 View_User(){
 	SSR_installation_status
-	python /usr/local/shadowsocksr/show_all_user_info.py
+	python /usr/local/shadowsocksr/SSR-Bash-Python/user/show_all_user_info.py
 	List_port_user
 	while true
 	do
