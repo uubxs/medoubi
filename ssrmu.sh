@@ -877,7 +877,7 @@ Service_SSR(){
 		#Install SSR-Bash Background
         wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
         chmod +x /usr/local/bin/ssr
-	wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/gfw
+	wget -N --no-check-certificate -O /usr/local/bin/gfw https://raw.githubusercontent.com/uubxs/medoubi/master/messr/gfw
         chmod +x /usr/local/bin/gfw
 		chkconfig --add ssrmu
 		chkconfig ssrmu on
@@ -887,6 +887,10 @@ Service_SSR(){
 		fi
 		chmod +x /etc/init.d/ssrmu
 		update-rc.d -f ssrmu defaults
+        wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
+        chmod +x /usr/local/bin/ssr
+	wget -N --no-check-certificate -O /usr/local/bin/gfw https://raw.githubusercontent.com/uubxs/medoubi/master/messr/gfw
+        chmod +x /usr/local/bin/gfw
 	fi
 	echo -e "${Info} ShadowsocksR服务 管理脚本下载完成 !"
 }
