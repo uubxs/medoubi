@@ -877,6 +877,8 @@ Service_SSR(){
 		#Install SSR-Bash Background
         wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
         chmod +x /usr/local/bin/ssr
+	wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/gfw
+        chmod +x /usr/local/bin/gfw
 		chkconfig --add ssrmu
 		chkconfig ssrmu on
 	else
