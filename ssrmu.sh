@@ -879,6 +879,7 @@ Service_SSR(){
         chmod +x /usr/local/bin/ssr
 	wget -N --no-check-certificate -O /usr/local/bin/gfw https://raw.githubusercontent.com/uubxs/medoubi/master/messr/gfw
         chmod +x /usr/local/bin/gfw
+	wget -N --no-check-certificate -O /usr/local/shadowsocksr/gfw_push.sh https://raw.githubusercontent.com/uubxs/medoubi/master/gfw_push.sh && chmod +x gfw_push.sh
 		chkconfig --add ssrmu
 		chkconfig ssrmu on
 	else
@@ -887,11 +888,12 @@ Service_SSR(){
 		fi
 		chmod +x /etc/init.d/ssrmu
 		update-rc.d -f ssrmu defaults
-        wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
+	fi
+	wget -N --no-check-certificate -O /usr/local/bin/ssr https://raw.githubusercontent.com/uubxs/medoubi/master/messr/ssr
         chmod +x /usr/local/bin/ssr
 	wget -N --no-check-certificate -O /usr/local/bin/gfw https://raw.githubusercontent.com/uubxs/medoubi/master/messr/gfw
         chmod +x /usr/local/bin/gfw
-	fi
+	wget -N --no-check-certificate -O /usr/local/shadowsocksr/gfw_push.sh https://raw.githubusercontent.com/uubxs/medoubi/master/gfw_push.sh && chmod +x gfw_push.sh
 	echo -e "${Info} ShadowsocksR服务 管理脚本下载完成 !"
 }
 # 安装 JQ解析器
