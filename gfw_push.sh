@@ -119,8 +119,7 @@ Set_Token(){
 		echo -e "请输入推送机器人 [API密匙]
 Token，通过 @notificationme_bot 机器人获取。
 获取步骤：向机器人发送 /start 后，机器人会告诉一个API URL，例如：https://tgbot.lbyczf.com/sendMessage/abc，其中的 abc 就是API密匙。"
-		read -e -p "(默认是我的：cnb7yijocxu1e1):" new_token
-		[[ -z "${new_token}" ]] && new_token="cnb7yijocxu1e1"
+		read -e -p "(不能为空):" new_token
 		if [[ ! -z "${new_token}" ]]; then
 			echo && echo "========================"
 			echo -e "	密匙 : ${Red_background_prefix} ${new_token} ${Font_color_suffix}"
